@@ -1,0 +1,4 @@
+asyncpg
+discord.py
+flake8
+fastapi
