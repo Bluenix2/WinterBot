@@ -34,12 +34,21 @@ class WinterBot(commands.Bot):
             print('Failed to setup PostgreSQL connection')
             raise e
 
+        try:
+            self.init = (sys.argv[1] == 'init')
+        except IndexError:
+            self.init = False
+
         for extension in initial_extensions:
             try:
                 self.load_extension(extension)
             except commands.ExtensionError:
                 print(f'Failed to load extension {extension}', file=sys.stderr)
                 traceback.print_exc()
+
+        if self.init:
+            print('Initialized database tables')
+            exit(0)
 
     async def on_ready(self) -> None:
         # on_ready can be called multiple times,
