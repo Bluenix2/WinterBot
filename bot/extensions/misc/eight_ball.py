@@ -7,19 +7,12 @@ from utils import ConnectionUtil, get_conn
 
 
 class PartialAnswer(BaseModel):
-    """Represents the model for editing an 8ball answer."""
+    """Represents the model for an incomplete 8ball answer."""
     response: Optional[str]
     weight: Optional[int]
 
 
-class NewAnswer(PartialAnswer):
-    """Represents the mode for inserting a new 8ball answer."""
-    # Override the Optional typing
-    response: str
-    weight: int
-
-
-class Answer(NewAnswer):
+class Answer(PartialAnswer):
     """Represents an already inserted 8ball answer, is usually returned."""
     id: int
 
@@ -40,7 +33,7 @@ async def get_answers(conn: ConnectionUtil = get_conn) -> List[Answer]:
 
 
 @api.post('/answers', response_model=Answer)
-async def add_answer(answer: NewAnswer, conn: ConnectionUtil = get_conn) -> Answer:
+async def add_answer(answer: PartialAnswer, conn: ConnectionUtil = get_conn) -> Answer:
     # FastAPI handles convering it into an Answer
     return await conn.fetchrow(
         'INSERT INTO eightball (response, weight) VALUES ($1, $2) RETURNING *;',
