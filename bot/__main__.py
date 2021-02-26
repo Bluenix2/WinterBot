@@ -25,13 +25,12 @@ class WinterBot(commands.Bot):
 
         self.client_id: int = config.client_id
 
-        loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
         try:
-            self.pool: asyncpg.pool.Pool = loop.run_until_complete(
+            self.pool: asyncpg.pool.Pool = self.loop.run_until_complete(
                 asyncpg.create_pool(config.postgresql)
             )
         except asyncpg.PostgresError as e:
-            print('Failed to setup PostgreSQL connection')
+            print('Failed to setup PostgreSQL connection', file=sys.stderr)
             raise e
 
         try:
