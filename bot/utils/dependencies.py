@@ -24,7 +24,7 @@ def dependency(func=None, *, use_cache: bool = True):
 @dependency()
 async def get_app(request: Request):
     """Dependency to get the serving app."""
-    return request.state.app
+    return request.app
 
 
 @dependency()

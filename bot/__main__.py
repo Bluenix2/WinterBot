@@ -2,14 +2,13 @@ import asyncio
 import datetime
 import sys
 import traceback
-from typing import Callable, Tuple
+from typing import Tuple
 
 import asyncpg
 import config
-import fastapi
 import utils
 from discord.ext import commands
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI
 from uvicorn import Config, Server
 
 initial_extensions: Tuple[str] = (
@@ -93,15 +92,6 @@ class WinterBot(commands.Bot):
 # Make sure this is not ran if the file is imported
 if __name__ == '__main__':
     app = FastAPI()
-
-    # Allow the usage of Depends(utils.get_app)
-    @app.middleware('http')
-    async def add_app_for_dependency(
-        request: Request, callback: Callable[[Request], Response]
-    ) -> fastapi.Response:
-        request.state.app = app
-
-        return await callback(request)
 
     bot = WinterBot(app)
 
