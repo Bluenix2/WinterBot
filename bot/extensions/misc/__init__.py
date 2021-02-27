@@ -1,4 +1,4 @@
-from extensions.misc import eight_ball
+from extensions.misc import eight_ball, send
 
 
 async def init(bot):
@@ -24,3 +24,5 @@ def setup(bot):
 
     bot.add_command(eight_ball.eightball)
     bot.app.include_router(eight_ball.api)
+
+    bot.add_command(send.send)
