@@ -5,7 +5,7 @@ from discord.ext import commands
 
 
 class ContextPoolAcquire:
-    """Utilization class for pool connection, mimics asyncpg.
+    """Utilization class for pool connection, mimics asyncpg's design.
     Its implementation allows all of the following usages:
 
     ```python
@@ -48,6 +48,9 @@ class ContextPoolAcquire:
 
 class ConnectionUtil:
     """Util for working with a database connection."""
+
+    __slots__ = ('pool', '_conn')
+
     def __init__(self, pool=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
