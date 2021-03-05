@@ -3,7 +3,8 @@ from typing import List, Optional
 from discord.ext import commands
 from fastapi import APIRouter
 from pydantic import BaseModel
-from utils import ConnectionUtil, get_conn
+
+from bot.utils import ConnectionUtil, get_conn
 
 
 class PartialAnswer(BaseModel):

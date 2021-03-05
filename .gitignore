@@ -22,7 +22,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
-# Configurations
-config.py
 .vscode
+
+# Credentials
+main.py

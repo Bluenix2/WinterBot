@@ -5,24 +5,40 @@ import traceback
 from typing import Tuple
 
 import asyncpg
-import config
-import utils
 from discord.ext import commands
 from fastapi import FastAPI
-from uvicorn import Config, Server
+from uvicorn import Config as UviConfig
+from uvicorn import Server
+
+from bot import utils
 
 initial_extensions: Tuple[str] = (
-    'extensions.misc',
+    'bot.extensions.misc',
 )
 
 
+class Config:
+    """Simple config class for setting up the options for the bot"""
+
+    def __init__(
+        self,
+        *,
+        client_id: int,
+        token: str,
+        postgresql: str = 'postgresql://winterbot:yourpw@localhost/winterdb',
+    ) -> None:
+
+        self.client_id = client_id
+        self.postgresql = postgresql
+        self.token = token
+
+
 class WinterBot(commands.Bot):
-    def __init__(self, app: FastAPI) -> None:
+    def __init__(self, config: Config, app: FastAPI) -> None:
         super().__init__(command_prefix='?')
 
+        self.config = config
         self.app: FastAPI = app
-
-        self.client_id: int = config.client_id
 
         try:
             self.pool: asyncpg.pool.Pool = self.loop.run_until_complete(
@@ -32,21 +48,12 @@ class WinterBot(commands.Bot):
             print('Failed to setup PostgreSQL connection', file=sys.stderr)
             raise e
 
-        try:
-            self.init = (sys.argv[1] == 'init')
-        except IndexError:
-            self.init = False
-
         for extension in initial_extensions:
             try:
                 self.load_extension(extension)
             except commands.ExtensionError:
                 print(f'Failed to load extension {extension}', file=sys.stderr)
                 traceback.print_exc()
-
-        if self.init:
-            print('Initialized database tables')
-            exit(0)
 
     async def on_ready(self) -> None:
         # on_ready can be called multiple times,
@@ -69,32 +76,23 @@ class WinterBot(commands.Bot):
         """Start serving the web app with Uvicorn. This will not resume control
         until the server terminates.
         """
-        server = Server(config=Config(self.app, **kwargs))
+        server = Server(config=UviConfig(self.app, **kwargs))
 
-        return await server.serve()
+        await server.serve()
 
-    async def start(self, token, *, bot=True, reconnect=True, **kwargs):
+    async def start(self, token, *, bot=True, reconnect=True, **kwargs) -> None:
         """Shorthand coroutine for starting the bot and app, control is not resumed until
         the Discord WebSocket is terminated or Uvicorn server killed.
         """
         await self.login(token, bot=bot)
-        tasks = (
+
+        tasks: Tuple[asyncio.Task] = (
             asyncio.create_task(self.serve(**kwargs)),
             asyncio.create_task(self.connect(reconnect=reconnect))
         )
+
         # If any one of them complete that means they died
-        return await asyncio.wait(tasks, loop=self.loop, return_when=asyncio.FIRST_COMPLETED)
+        await asyncio.wait(tasks, loop=self.loop, return_when=asyncio.FIRST_COMPLETED)
 
-    def run(self) -> None:
-        return super().run(config.token)
-
-
-# Make sure this is not ran if the file is imported
-if __name__ == '__main__':
-    app = FastAPI()
-
-    bot = WinterBot(app)
-
-    app.bot = bot
-
-    bot.run()
+    def run(self):
+        super().run(self.config.token)

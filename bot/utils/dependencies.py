@@ -1,6 +1,7 @@
 from fastapi import Request
 from fastapi.params import Depends  # The real Depends class
-from utils import ConnectionUtil
+
+from bot.utils import ConnectionUtil
 
 
 class CallableDepends(Depends):

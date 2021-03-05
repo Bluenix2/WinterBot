@@ -12,8 +12,6 @@ but voluntarily by the Community Moderator Bluenix.
 
 ## Installation
 
-### Bot Installation
-
 1. **Install requirements**
 
     Install Python 3.7.9 or newer and PostgreSQL 13.
@@ -35,6 +33,23 @@ but voluntarily by the Community Moderator Bluenix.
     CREATE DATABASE winterdb OWNER winterbot;
     ```
 
-5. **Set up configuration**
+    Then use the `psql` to also execute `init.sql`.
 
-    The bot uses a `config.py` file for configuration of credentials.
+5. **Set up main file**
+
+    Use the following template to set up your own main file:
+
+    ```python
+    from fastapi import FastAPI
+
+    from bot import Config, WinterBot
+
+    # Your IDE should show other options you may have available.
+    config = Config(client_id=123, token='123')
+
+    app = FastAPI()
+    bot = WinterBot(app, config)
+    app.bot = bot
+
+    bot.run()
+    ```
