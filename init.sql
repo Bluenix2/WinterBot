@@ -1,4 +1,23 @@
--- 8ball features
+-- Automation/Purge
+CREATE TABLE purges (
+    channel_id BIGINT PRIMARY KEY
+);
+
+-- Automation/Reactions
+CREATE TABLE reactions (
+    message_id BIGINT PRIMARY KEY
+)
+
+-- Automation/Roles
+CREATE TABLE roles (
+    message_id BIGINT NOT NULL,
+    reaction VARCHAR NOT NULL,
+    role_id BIGINT NOT NULL,
+
+    PRIMARY KEY(message_id, reaction)
+)
+
+-- Miscellanous/8Ball
 CREATE SEQUENCE eightball_sqc;
 
 CREATE TABLE eightball (
